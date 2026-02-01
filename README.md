@@ -79,7 +79,7 @@ Controllers are supported for selecting a server, but no typing ability or closi
 
 - Input buttons: [https://kenney.nl/assets/input-prompts](https://kenney.nl/assets/input-prompts)
 - Logo: [https://commons.wikimedia.org/wiki/File:SPB_fist.svg](https://commons.wikimedia.org/wiki/File:SPB_fist.svg)
-
+- Style inspiration: [https://github.com/heysnippy](https://github.com/heysnippy)
 ## AI Disclosure
 
 AI assistance was used in coding of this project.
