@@ -56,7 +56,7 @@ Controllers are supported for selecting a server, but no typing ability or closi
    - `--bsb-highlight-dark`
    - `--bsb-text`
    - `--bsb-text-muted`
-2. Set your server website URL in DSS Browser. (defaults to https://<ip> or http://<ip>
+2. Set your server website URL in DSS Browser. (defaults to https://IP or http://IP
    The app will pull the `--bsb-` variables from your site and theme the UI.
 
    Example:
