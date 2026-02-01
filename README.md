@@ -46,8 +46,7 @@ Controllers are supported for selecting a server, but no typing ability or closi
 
 ## Tutorial: Server Website Theme Colors
 
-1. Host a simple webpage for your server (HTTPS recommended).
-2. Add CSS variables with the `--bsb-` prefix to your page. Supported variables:
+1. Add CSS variables with the `--bsb-` prefix to your page. Supported variables:
    - `--bsb-primary-light`
    - `--bsb-primary`
    - `--bsb-primary-dark`
@@ -57,7 +56,7 @@ Controllers are supported for selecting a server, but no typing ability or closi
    - `--bsb-highlight-dark`
    - `--bsb-text`
    - `--bsb-text-muted`
-3. Set your server website URL in DSS Browser.  
+2. Set your server website URL in DSS Browser. (defaults to https://<ip> or http://<ip>
    The app will pull the `--bsb-` variables from your site and theme the UI.
 
    Example:
