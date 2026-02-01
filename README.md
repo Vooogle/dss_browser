@@ -40,7 +40,7 @@ Controllers are supported for selecting a server, but no typing ability or closi
 
 ## Server List
 
-1. From [github.com/Vooogle/dss_worker_list](https://github.com/Vooogle/dss_worker_list) download the heartbeat scripts.
+1. From [github.com/Vooogle/dss_worker_list](https://github.com/Vooogle/dss_worker_list) download the heartbeat script.
 2. Turn on full system access on your dslconfig.ini
 3. Add the heartbeat script into the scripts, and modify it to be correct for your server.
 
@@ -82,7 +82,7 @@ Controllers are supported for selecting a server, but no typing ability or closi
 - Style inspiration: [https://github.com/heysnippy](https://github.com/heysnippy)
 ## AI Disclosure
 
-AI assistance was used in coding of this project.
+AI assistance was used in coding of this project. All the assets and images were created by me or sourced online, visible from credits.
 
 ## Legal Disclosure
 
