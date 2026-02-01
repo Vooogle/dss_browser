@@ -40,14 +40,13 @@ Controllers are supported for selecting a server, but no typing ability or closi
 
 ## Server List
 
-1. From [github.com/Vooogle/dss_worker_list](https://github.com/Vooogle/dss_worker_list) download the heartbeat scripts.
+1. From [github.com/Vooogle/dss_worker_list](https://github.com/Vooogle/dss_worker_list) download the heartbeat script.
 2. Turn on full system access on your dslconfig.ini
 3. Add the heartbeat script into the scripts, and modify it to be correct for your server.
 
 ## Tutorial: Server Website Theme Colors
 
-1. Host a simple webpage for your server (HTTPS recommended).
-2. Add CSS variables with the `--bsb-` prefix to your page. Supported variables:
+1. Add CSS variables with the `--bsb-` prefix to your page. Supported variables:
    - `--bsb-primary-light`
    - `--bsb-primary`
    - `--bsb-primary-dark`
@@ -57,7 +56,7 @@ Controllers are supported for selecting a server, but no typing ability or closi
    - `--bsb-highlight-dark`
    - `--bsb-text`
    - `--bsb-text-muted`
-3. Set your server website URL in DSS Browser.  
+2. Set your server website URL in DSS Browser. (defaults to https://IP or http://IP
    The app will pull the `--bsb-` variables from your site and theme the UI.
 
    Example:
@@ -79,10 +78,10 @@ Controllers are supported for selecting a server, but no typing ability or closi
 
 - Input buttons: [https://kenney.nl/assets/input-prompts](https://kenney.nl/assets/input-prompts)
 - Logo: [https://commons.wikimedia.org/wiki/File:SPB_fist.svg](https://commons.wikimedia.org/wiki/File:SPB_fist.svg)
-
+- Style inspiration: [https://github.com/heysnippy](https://github.com/heysnippy)
 ## AI Disclosure
 
-AI assistance was used in coding of this project.
+AI assistance was used in coding of this project. All the assets and images were created by me or sourced online, visible from credits.
 
 ## Legal Disclosure
 
