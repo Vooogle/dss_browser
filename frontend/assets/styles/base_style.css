@@ -1,0 +1,60 @@
+/* -------------------------
+   Font Imports
+-------------------------- */
+
+@font-face {
+  font-family: 'Google Sans Flex';
+  src: url('../fonts/GoogleSansFlex/GoogleSansFlex-VariableFont_GRAD,ROND,opsz,slnt,wdth,wght.ttf')
+       format('truetype-variations');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Orelega One';
+  src: url('../fonts/OrelegaOne/OrelegaOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* -------------------------
+   Global Font Smoothing
+-------------------------- */
+
+html, body {
+  -webkit-font-smoothing: antialiased;      /* Chrome, Edge, Safari, QtWebEngine */
+  text-rendering: optimizeLegibility;       /* Better kerning & ligatures */
+  font-family: 'Google Sans Flex', sans-serif;
+}
+
+/* -------------------------
+   Default Typography
+-------------------------- */
+
+.important,
+h1, h2, .title-important {
+  font-family: 'Orelega One', serif;
+}
+
+.basic,
+p, li, .title-basic {
+  font-family: 'Google Sans Flex', sans-serif;
+}
+
+/* -------------------------
+   Color Palette
+-------------------------- */
+
+:root {
+  --bsb-primary-light: #1a7bd1;
+  --bsb-primary: #0d63aa;
+  --bsb-primary-dark: #093c6d;
+  --bsb-primary-darker: #00223e;
+
+  --bsb-highlight-light: #ffd633;
+  --bsb-highlight: #ffba00;
+  --bsb-highlight-dark: #cc9900;
+
+  --bsb-text: #ffffff;
+  --bsb-text-muted: #cfcfcf;
+}

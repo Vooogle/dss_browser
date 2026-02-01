@@ -1,0 +1,28 @@
+# Core dependencies
+PyQt6>=6.4.0
+PyQt6-WebEngine>=6.4.0
+
+# Credential management - OS keyring integration
+keyring>=24.0.0
+
+# HTTP requests for dynamic server loading
+requests>=2.31.0
+
+# Process management for killing Rockstar Launcher
+psutil>=5.9.0
+
+# Optional: Specific keyring backends for different platforms
+# Windows
+# pywin32-ctypes>=0.2.0
+
+# macOS - keyring automatically uses macOS Keychain
+
+# Linux - automatically uses Secret Service API (GNOME Keyring/KWallet)
+# If Secret Service is unavailable, falls back to encrypted file storage
+# secretstorage>=3.3.0
+
+# For better cross-platform keyring support
+keyrings.alt>=5.0.0
+
+# Encrypted credential storage fallback (SteamOS gaming mode)
+cryptography>=42.0.0

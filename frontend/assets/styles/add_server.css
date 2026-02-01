@@ -1,0 +1,174 @@
+* {
+    box-sizing: border-box;
+}
+
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    background: var(--bsb-primary-darker);
+    color: var(--bsb-text);
+    font-family: "Google Sans Flex", sans-serif;
+    overflow: hidden;
+}
+
+#top-bar {
+    height: 48px;
+    background: var(--bsb-primary-darker);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 3px solid var(--bsb-highlight);
+    cursor: move;
+    position: relative;
+}
+
+#title {
+    font-family: "Orelega One", serif;
+    font-size: 16px;
+    letter-spacing: 0.6px;
+}
+
+#window-controls {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.window-control-btn {
+    width: 44px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.window-control-btn img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+}
+
+.window-control-btn:hover {
+    background: #d32f2f;
+}
+
+#window-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#content {
+    position: absolute;
+    top: 48px;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    padding: 20px 24px;
+    overflow-y: auto;
+}
+
+.form-group {
+    margin-bottom: 18px;
+    background: var(--bsb-primary-dark);
+    border: 1px solid var(--bsb-primary-darker);
+    padding: 14px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-family: "Orelega One", serif;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 9px 10px;
+    background: var(--bsb-primary-darker);
+    border: 2px solid var(--bsb-primary-darker);
+    color: var(--bsb-text);
+    font-family: "Google Sans Flex", sans-serif;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--bsb-highlight-dark);
+}
+
+.form-group input::placeholder {
+    color: var(--bsb-text-muted);
+}
+
+body.controller-visible .controller-focus {
+    outline: 2px solid var(--bsb-highlight);
+    outline-offset: 2px;
+}
+
+#bottom-bar {
+    position: absolute;
+    bottom: 0;
+    height: 60px;
+    width: 100%;
+    background: var(--bsb-primary-darker);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border-top: 3px solid var(--bsb-highlight);
+}
+
+.btn-hero {
+    background: var(--bsb-highlight);
+    color: var(--bsb-primary-darker);
+    border: none;
+    font-family: "Orelega One", serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 24px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.btn-hero:hover {
+    background: var(--bsb-highlight-light);
+}
+
+.btn-hero:active {
+    transform: scale(0.98);
+}
+
+.controller-inline {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    image-rendering: auto;
+    display: none;
+    object-fit: contain;
+}
+
+body.controller-visible .controller-inline {
+    display: block;
+}
+
+#error-message {
+    margin-top: 10px;
+    padding: 10px;
+    background: #d32f2f;
+    text-align: center;
+    font-family: "Google Sans Flex", sans-serif;
+}

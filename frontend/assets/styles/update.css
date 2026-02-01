@@ -1,0 +1,149 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bsb-primary-darker);
+    color: var(--bsb-text);
+    font-family: "Google Sans Flex", sans-serif;
+    overflow: hidden;
+}
+
+#top-bar {
+    height: 48px;
+    background: var(--bsb-primary-darker);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 3px solid var(--bsb-highlight);
+    cursor: move;
+    position: relative;
+}
+
+#title {
+    font-family: "Orelega One", serif;
+    font-size: 16px;
+    letter-spacing: 0.6px;
+}
+
+#window-controls {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.window-control-btn {
+    width: 44px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.window-control-btn img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+}
+
+.window-control-btn:hover {
+    background: #d32f2f;
+}
+
+#content {
+    position: absolute;
+    top: 48px;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    padding: 20px 24px;
+}
+
+.panel {
+    background: var(--bsb-primary-dark);
+    border: 1px solid var(--bsb-primary-darker);
+    padding: 16px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-family: "Orelega One", serif;
+}
+
+.label {
+    color: var(--bsb-text-muted);
+}
+
+.status {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--bsb-text);
+}
+
+#bottom-bar {
+    position: absolute;
+    bottom: 0;
+    height: 60px;
+    width: 100%;
+    background: var(--bsb-primary-darker);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0 20px;
+    border-top: 3px solid var(--bsb-highlight);
+}
+
+.btn-hero {
+    background: var(--bsb-highlight);
+    color: var(--bsb-primary-darker);
+    border: none;
+    font-family: "Orelega One", serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 24px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.btn-hero:hover {
+    background: var(--bsb-highlight-light);
+}
+
+.btn-hero:active {
+    transform: scale(0.98);
+}
+
+.btn-side {
+    background: var(--bsb-primary-dark);
+    color: var(--bsb-text);
+    border: 2px solid var(--bsb-highlight);
+    font-family: "Orelega One", serif;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.btn-side:hover {
+    background: var(--bsb-primary);
+}
+
+.btn-side:disabled {
+    opacity: 0.5;
+    cursor: default;
+}

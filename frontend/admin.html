@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin List</title>
+    <link rel="stylesheet" href="assets/styles/active_base_style.css">
+    <link rel="stylesheet" href="assets/styles/admin.css">
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</head>
+<body>
+
+    <div id="top-bar" class="drag">
+        <span id="title">Admin List</span>
+        <div id="window-controls">
+            <button class="window-control-btn" data-event="close" aria-label="Close">
+                <img src="assets/images/close.png" alt="">
+            </button>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="admin-controls">
+            <label for="admin-token">Admin Token</label>
+            <div class="admin-token-row">
+                <input type="password" id="admin-token" placeholder="Paste admin token">
+                <button id="admin-token-toggle" class="btn-side" type="button">Show</button>
+            </div>
+
+            <label for="admin-search">Search</label>
+            <input type="text" id="admin-search" placeholder="Filter by IP, port, or website">
+
+            <div class="admin-actions">
+                <button id="admin-refresh" class="btn-side">Refresh</button>
+            </div>
+        </div>
+
+        <div id="admin-list" class="admin-list"></div>
+    </div>
+
+    <script>
+        let pybridge = null;
+        let listUrl = "";
+
+        function setListUrl(url) {
+            listUrl = (url || "").trim() || "https://bsb.seeks.men/list";
+        }
+
+        function setAdminToken(token) {
+            const el = document.getElementById("admin-token");
+            if (el) el.value = token || "";
+        }
+
+        function getBaseUrl() {
+            const trimmed = listUrl.trim();
+            if (trimmed.toLowerCase().endsWith("/list")) {
+                return trimmed.slice(0, -5);
+            }
+            return trimmed;
+        }
+
+        function renderList(servers) {
+            const container = document.getElementById("admin-list");
+            if (!container) return;
+            container.innerHTML = "";
+
+            if (!servers.length) {
+                const empty = document.createElement("div");
+                empty.className = "admin-empty";
+                empty.textContent = "No servers found";
+                container.appendChild(empty);
+                return;
+            }
+
+            servers.forEach(server => {
+                const row = document.createElement("div");
+                row.className = "admin-row";
+
+                const meta = document.createElement("div");
+                meta.className = "admin-meta";
+
+                const ip = document.createElement("div");
+                ip.className = "admin-ip";
+                ip.textContent = `${server.ip}:${server.port}`;
+
+                const site = document.createElement("div");
+                site.className = "admin-website";
+                site.textContent = server.website || "(no website)";
+
+                const tags = document.createElement("div");
+                tags.className = "admin-tags";
+                if (server.trusted) {
+                    const tag = document.createElement("span");
+                    tag.className = "tag trusted";
+                    tag.textContent = "trusted";
+                    tags.appendChild(tag);
+                }
+                if (server.important) {
+                    const tag = document.createElement("span");
+                    tag.className = "tag important";
+                    tag.textContent = "important";
+                    tags.appendChild(tag);
+                }
+
+                meta.appendChild(ip);
+                meta.appendChild(site);
+                meta.appendChild(tags);
+
+                const actions = document.createElement("div");
+                actions.className = "admin-row-actions";
+
+                const trustBtn = document.createElement("button");
+                trustBtn.className = "btn-side";
+                trustBtn.textContent = "Trust";
+                trustBtn.onclick = () => sendAdminAction("trust", server);
+
+                const banBtn = document.createElement("button");
+                banBtn.className = "btn-danger";
+                banBtn.textContent = "Ban";
+                banBtn.onclick = () => sendAdminAction("ban", server);
+
+                actions.appendChild(trustBtn);
+                actions.appendChild(banBtn);
+
+                row.appendChild(meta);
+                row.appendChild(actions);
+                container.appendChild(row);
+            });
+        }
+
+        async function fetchList() {
+            if (!listUrl) {
+                return;
+            }
+            try {
+                const response = await fetch(listUrl);
+                const data = await response.json();
+                applySearch(data);
+            } catch (e) {
+                renderList([]);
+            }
+        }
+
+        function applySearch(data) {
+            const query = (document.getElementById("admin-search")?.value || "").toLowerCase();
+            if (!query) {
+                renderList(data);
+                return;
+            }
+            const filtered = data.filter(item => {
+                const ip = `${item.ip}:${item.port}`.toLowerCase();
+                const website = (item.website || "").toLowerCase();
+                return ip.includes(query) || website.includes(query);
+            });
+            renderList(filtered);
+        }
+
+        async function sendAdminAction(action, server) {
+            const token = (document.getElementById("admin-token")?.value || "").trim();
+            if (!token) {
+                return;
+            }
+            const base = getBaseUrl();
+            const url = `${base}/admin/${action}`;
+            try {
+                await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        ip: server.ip,
+                        port: server.port
+                    })
+                });
+                fetchList();
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        function wire() {
+            if (typeof QWebChannel !== "undefined" && typeof qt !== "undefined" && qt.webChannelTransport) {
+                new QWebChannel(qt.webChannelTransport, function (channel) {
+                    pybridge = channel.objects.pybridge;
+                });
+            }
+
+            const refreshBtn = document.getElementById("admin-refresh");
+            if (refreshBtn) {
+                refreshBtn.addEventListener("click", fetchList);
+            }
+
+            const search = document.getElementById("admin-search");
+            if (search) {
+                search.addEventListener("input", () => {
+                    fetchList();
+                });
+            }
+
+            const tokenToggle = document.getElementById("admin-token-toggle");
+            if (tokenToggle) {
+                tokenToggle.addEventListener("click", () => {
+                    const tokenInput = document.getElementById("admin-token");
+                    const isHidden = tokenInput.type === "password";
+                    tokenInput.type = isHidden ? "text" : "password";
+                    tokenToggle.textContent = isHidden ? "Hide" : "Show";
+                });
+            }
+
+            const tokenInput = document.getElementById("admin-token");
+            if (tokenInput) {
+                tokenInput.addEventListener("change", () => {
+                    if (pybridge) {
+                        pybridge.call("saveAdminToken", tokenInput.value || "");
+                    }
+                });
+            }
+        }
+
+        setTimeout(() => {
+            wire();
+            fetchList();
+        }, 100);
+    </script>
+
+</body>
+</html>

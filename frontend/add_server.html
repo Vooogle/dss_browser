@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Add Server</title>
+    <link rel="stylesheet" href="assets/styles/active_base_style.css">
+    <link rel="stylesheet" href="assets/styles/add_server.css">
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div id="top-bar" class="drag">
+        <span id="title">Add Server</span>
+
+        <div id="window-controls">
+            <button class="window-control-btn" data-event="close" aria-label="Close">
+                <img src="assets/images/close.png" alt="">
+            </button>
+            <img class="controller-inline controller-select" src="assets/images/controller/select.png" alt="">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        <div class="form-group">
+            <label for="ip-input">IP Address *</label>
+            <input type="text" id="ip-input" placeholder="Enter IP (e.g., 127.0.0.1)">
+        </div>
+
+        <div class="form-group">
+            <label for="port-input">Port</label>
+            <input type="text" id="port-input" placeholder="Default: 17017">
+        </div>
+
+        <div class="form-group">
+            <label for="website-input">Website</label>
+            <input type="text" id="website-input" placeholder="Optional">
+        </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div id="bottom-bar">
+        <img class="controller-inline controller-start" src="assets/images/controller/start.png" alt="">
+        <button id="save-btn" class="btn-hero">Add Server</button>
+    </div>
+
+    <script>
+        function initBridge() {
+            if (window.pybridge || window._pybridgeReady) return;
+            if (typeof QWebChannel === "undefined" || typeof qt === "undefined" || !qt.webChannelTransport) {
+                return;
+            }
+            window._pybridgeReady = true;
+            new QWebChannel(qt.webChannelTransport, function (channel) {
+                window.pybridge = channel.objects.pybridge;
+            });
+        }
+
+        // Wait for the pybridge to be available
+        function setupSaveButton() {
+            initBridge();
+            const saveBtn = document.getElementById('save-btn');
+
+            saveBtn.onclick = function() {
+                const ip = document.getElementById('ip-input').value.trim();
+                const port = document.getElementById('port-input').value.trim();
+                const website = document.getElementById('website-input').value.trim();
+
+                const data = JSON.stringify({ ip, port, website });
+
+                if (window.pybridge) {
+                    window.pybridge.call('save', data);
+                }
+            };
+
+            // Allow Enter key to submit
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        saveBtn.click();
+                    }
+                });
+            });
+        }
+
+        // Controller support: Select closes the dialog.
+        let controllerButtons = {};
+        let saveBtnRef = null;
+        let controllerIndex = 0;
+
+        function getFocusableElements() {
+            const selectors = [
+                "button",
+                "input",
+                "select",
+                "textarea",
+                "[tabindex]:not([tabindex='-1'])"
+            ];
+            return Array.from(document.querySelectorAll(selectors.join(",")))
+                .filter(el => !el.disabled && el.offsetParent !== null);
+        }
+
+        function setControllerFocus(index) {
+            const items = getFocusableElements();
+            items.forEach(el => el.classList.remove("controller-focus"));
+            if (!items.length) return;
+            const clamped = Math.max(0, Math.min(index, items.length - 1));
+            controllerIndex = clamped;
+            const target = items[controllerIndex];
+            target.classList.add("controller-focus");
+            target.focus({ preventScroll: true });
+            target.scrollIntoView({ block: "nearest" });
+        }
+
+        function handleButton(pad, index, timestamp, action, repeatMs = 300) {
+            const btn = pad.buttons[index];
+            if (!btn) return;
+            const pressed = !!btn.pressed;
+            const last = controllerButtons[index] || 0;
+            if (pressed) {
+                if (!last) {
+                    controllerButtons[index] = timestamp;
+                }
+                return;
+            }
+            if (last && timestamp - last >= repeatMs) {
+                controllerButtons[index] = 0;
+                action();
+            }
+        }
+
+        function startControllerLoop() {
+            if (!navigator.getGamepads) return;
+            function step(timestamp) {
+                if (!document.hasFocus()) {
+                    requestAnimationFrame(step);
+                    return;
+                }
+                const pads = navigator.getGamepads();
+                const pad = pads && pads[0];
+                if (pad) {
+                    handleButton(pad, 9, timestamp, () => {
+                        if (saveBtnRef) {
+                            saveBtnRef.click();
+                        }
+                    }, 300);
+                    handleButton(pad, 8, timestamp, () => {
+                        if (window.pybridge) {
+                            window.pybridge.call("close", "");
+                        }
+                    }, 300);
+                    handleButton(pad, 0, timestamp, () => {
+                        const active = document.activeElement;
+                        if (active && typeof active.click === "function") {
+                            active.click();
+                        }
+                    }, 300);
+                    handleButton(pad, 12, timestamp, () => setControllerFocus(controllerIndex - 1), 160);
+                    handleButton(pad, 13, timestamp, () => setControllerFocus(controllerIndex + 1), 160);
+                }
+                requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function enableDrag() {
+            const dragEl = document.querySelector(".drag");
+            if (!dragEl) return;
+            let dragging = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            dragEl.addEventListener("mousedown", (e) => {
+                if (e.button !== 0) return;
+                if (e.target.closest("button") || e.target.closest("[data-event]")) return;
+                dragging = true;
+                lastX = e.screenX;
+                lastY = e.screenY;
+            });
+
+            document.addEventListener("mouseup", () => {
+                dragging = false;
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!dragging || !window.pybridge) return;
+                const dx = e.screenX - lastX;
+                const dy = e.screenY - lastY;
+                lastX = e.screenX;
+                lastY = e.screenY;
+                window.pybridge.call("dragMove", dx + "," + dy);
+            });
+        }
+
+        // Call setup after a short delay to ensure pybridge is ready
+        function updateControllerVisible() {
+            const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+            const hasPad = Array.from(pads || []).some(pad => pad);
+            document.body.classList.toggle("controller-visible", hasPad);
+        }
+
+        window.addEventListener("gamepadconnected", updateControllerVisible);
+        window.addEventListener("gamepaddisconnected", updateControllerVisible);
+
+        setTimeout(() => {
+            setupSaveButton();
+            saveBtnRef = document.getElementById('save-btn');
+            startControllerLoop();
+            setControllerFocus(0);
+            updateControllerVisible();
+            enableDrag();
+        }, 100);
+    </script>
+
+</body>
+</html>

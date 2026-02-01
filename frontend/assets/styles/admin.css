@@ -1,0 +1,189 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bsb-primary-darker);
+    color: var(--bsb-text);
+    font-family: "Google Sans Flex", sans-serif;
+    overflow: hidden;
+}
+
+#top-bar {
+    height: 48px;
+    background: var(--bsb-primary-darker);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 3px solid var(--bsb-highlight);
+    cursor: move;
+    position: relative;
+}
+
+#title {
+    font-family: "Orelega One", serif;
+    font-size: 16px;
+    letter-spacing: 0.6px;
+}
+
+#window-controls {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.window-control-btn {
+    width: 44px;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.window-control-btn img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+}
+
+.window-control-btn:hover {
+    background: #d32f2f;
+}
+
+#content {
+    position: absolute;
+    top: 48px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px 24px;
+    overflow: auto;
+}
+
+.admin-controls {
+    background: var(--bsb-primary-dark);
+    border: 1px solid var(--bsb-primary-darker);
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.admin-token-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.admin-controls label {
+    font-family: "Orelega One", serif;
+    font-size: 14px;
+}
+
+.admin-controls input {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--bsb-primary-darker);
+    color: var(--bsb-text);
+    border: 2px solid var(--bsb-primary-darker);
+}
+
+.admin-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.admin-list {
+    display: grid;
+    gap: 10px;
+}
+
+.admin-row {
+    background: var(--bsb-primary);
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+}
+
+.admin-meta {
+    display: grid;
+    gap: 6px;
+}
+
+.admin-ip {
+    font-family: "Orelega One", serif;
+}
+
+.admin-website {
+    font-size: 12px;
+    color: var(--bsb-text-muted);
+}
+
+.admin-tags {
+    display: flex;
+    gap: 6px;
+}
+
+.tag {
+    font-size: 11px;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    border: 1px solid var(--bsb-highlight);
+}
+
+.tag.trusted {
+    background: var(--bsb-highlight);
+    color: var(--bsb-primary-darker);
+}
+
+.tag.important {
+    background: var(--bsb-primary-dark);
+    color: var(--bsb-text);
+    border-color: var(--bsb-highlight-light);
+}
+
+.admin-row-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-side {
+    background: var(--bsb-primary-dark);
+    color: var(--bsb-text);
+    border: 2px solid var(--bsb-highlight);
+    font-family: "Orelega One", serif;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.btn-side:hover {
+    background: var(--bsb-primary);
+}
+
+.btn-danger {
+    background: #6b1f1f;
+    color: var(--bsb-text);
+    border: 2px solid #a03535;
+    font-family: "Orelega One", serif;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #8a2a2a;
+}
+
+.admin-empty {
+    color: var(--bsb-text-muted);
+}

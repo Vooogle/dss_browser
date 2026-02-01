@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DSSB Server Browser</title>
+
+    <link rel="stylesheet" href="assets/styles/active_base_style.css">
+    <link rel="stylesheet" href="assets/styles/main.css">
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</head>
+
+<body>
+
+    <div id="gradient-layer" aria-hidden="true"></div>
+    <div id="tile-layer" aria-hidden="true"></div>
+
+    <!-- Top bar (draggable) -->
+    <div id="top-bar" class="drag">
+        <div id="top-bar-icon" aria-hidden="true">
+            <img id="base-icon" class="icon-base" src="assets/images/icon.png" alt="">
+            <img id="server-icon" class="icon-server" alt="">
+        </div>
+        <span id="title"></span>
+
+        <div id="window-controls">
+            <button class="window-control-btn" data-event="minimize">
+                <img src="assets/images/minimize.png" alt="Minimize">
+            </button>
+            <button class="window-control-btn" data-event="maximize">
+                <img src="assets/images/maximize.png" alt="Maximize">
+            </button>
+            <button class="window-control-btn" data-event="close">
+                <img src="assets/images/close.png" alt="Close">
+            </button>
+        </div>
+    </div>
+
+    <!-- Left side: menu -->
+    <div id="sidebar">
+        <div id="menu-panel">
+            <div class="search-row">
+                <input id="search-box" type="text" data-event="search" placeholder="Search servers...">
+                <img class="controller-inline controller-left" src="assets/images/controller/button_left.png" alt="">
+                <button class="icon-btn icon-btn--img" data-event="refresh" title="Refresh" aria-label="Refresh">
+                    <svg class="icon-svg" viewBox="0 0 64 64" aria-hidden="true">
+                        <path d="M12.6 18.1 L20.6 28.8 Q21.05 29.45 21 30.2 L20.35 31.45 Q19.75 32 19 32 L14 32 Q14 39.45 19.3 44.75 24.55 50 32 50 39.45 50 44.75 44.75 50 39.45 50 32 50 24.55 44.75 19.3 39.45 14 32 14 24.7 14 19.5 19.05 L15.85 14.25 Q22.65 8 32 8 41.95 8 49 15.05 56 22.05 56 32 56 41.95 49 49 41.95 56 32 56 22.05 56 15.05 49 8 41.95 8 32 L3 32 Q2.25 32 1.65 31.45 1.1 30.95 1 30.2 0.95 29.45 1.4 28.8 L9.4 18.1 Q9.8 17.6 10.4 17.4 11 17.25 11.6 17.4 12.2 17.6 12.6 18.1"/>
+                    </svg>
+                </button>
+                <button class="icon-btn icon-btn--img icon-btn--add" data-event="add" title="Add server" aria-label="Add server">
+                    <svg class="icon-svg" viewBox="0 0 64 64" aria-hidden="true">
+                        <path fill="currentColor" d="M 3.1191406 -28.802734 L 28.802734 -28.802734 L 28.802734 -3.1191406 L 35.197266 -3.1191406 L 35.197266 -28.802734 L 60.880859 -28.802734 L 60.880859 -35.197266 L 35.197266 -35.197266 L 35.197266 -60.880859 L 28.802734 -60.880859 L 28.802734 -35.197266 L 3.1191406 -35.197266 L 3.1191406 -28.802734 z" transform="rotate(90)"/>
+                    </svg>
+                </button>
+                <img class="controller-inline controller-up" src="assets/images/controller/button_up.png" alt="">
+            </div>
+
+            <div id="server-list" class="server-list">
+                <!-- Server list will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content area -->
+    <div id="content">
+        <div id="content-body"></div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div id="bottom-bar">
+        <img class="controller-inline controller-select" src="assets/images/controller/select.png" alt="">
+        <button class="btn-side" data-event="settings">Settings</button>
+
+        <input id="username" type="text" data-event="username" placeholder="Username">
+        <input id="password" type="password" data-event="password" placeholder="Password">
+
+        <button class="btn-hero" data-event="play">Play</button>
+        <img class="controller-inline controller-start" src="assets/images/controller/start.png" alt="">
+    </div>
+
+    <script>
+        const TILE_SOURCES = [
+            "assets/images/tiles/tile_0_00.webp",
+            "assets/images/tiles/tile_1_00.webp",
+            "assets/images/tiles/tile_2_00.webp",
+            "assets/images/tiles/tile_3_00.webp",
+            "assets/images/tiles/tile_4_00.webp"
+        ];
+
+        const TILE_RATIOS = {
+            "tile_0": [1, 1],
+            "tile_1": [2, 1],
+            "tile_2": [1, 2],
+            "tile_3": [3, 2],
+            "tile_4": [2, 3]
+        };
+
+        function shuffle(list) {
+            for (let i = list.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [list[i], list[j]] = [list[j], list[i]];
+            }
+            return list;
+        }
+
+        function buildTiles() {
+            const layer = document.getElementById("tile-layer");
+            if (!layer) return;
+
+            layer.innerHTML = "";
+
+            const overscan = 160;
+            const width = window.innerWidth + overscan * 2;
+            const height = window.innerHeight + overscan * 2;
+            const cell = 160;
+            const gap = 0;
+            const cols = Math.max(1, Math.floor((width + gap) / (cell + gap)));
+            const rows = Math.max(1, Math.floor((height + gap) / (cell + gap)));
+            const offsetX = -overscan;
+            const offsetY = -overscan;
+
+            layer.style.width = `${width}px`;
+            layer.style.height = `${height}px`;
+            layer.style.left = `${offsetX}px`;
+            layer.style.top = `${offsetY}px`;
+
+            const occupied = Array.from({ length: rows }, () => Array(cols).fill(false));
+            const positions = [];
+            for (let r = 0; r < rows; r += 1) {
+                for (let c = 0; c < cols; c += 1) {
+                    positions.push([r, c]);
+                }
+            }
+
+            const tileKeys = Object.keys(TILE_RATIOS);
+            shuffle(positions);
+
+            function canPlace(r, c, w, h) {
+                if (r + h > rows || c + w > cols) return false;
+                for (let rr = r; rr < r + h; rr += 1) {
+                    for (let cc = c; cc < c + w; cc += 1) {
+                        if (occupied[rr][cc]) return false;
+                    }
+                }
+                return true;
+            }
+
+            function markPlaced(r, c, w, h) {
+                for (let rr = r; rr < r + h; rr += 1) {
+                    for (let cc = c; cc < c + w; cc += 1) {
+                        occupied[rr][cc] = true;
+                    }
+                }
+            }
+
+            positions.forEach(([r, c]) => {
+                if (occupied[r][c]) return;
+
+                let chosen = null;
+                const shuffled = shuffle(tileKeys.slice());
+                for (const key of shuffled) {
+                    const [w, h] = TILE_RATIOS[key] || [1, 1];
+                    if (canPlace(r, c, w, h)) {
+                        chosen = { key, w, h };
+                        break;
+                    }
+                }
+
+                if (!chosen) {
+                    chosen = { key: "tile_0", w: 1, h: 1 };
+                }
+
+                const src = TILE_SOURCES.find((item) => item.includes(chosen.key)) || TILE_SOURCES[0];
+                const tileWidth = chosen.w * cell + (chosen.w - 1) * gap;
+                const tileHeight = chosen.h * cell + (chosen.h - 1) * gap;
+                const x = c * (cell + gap);
+                const y = r * (cell + gap);
+
+                const tile = document.createElement("div");
+                tile.className = "tile";
+                tile.style.width = `${tileWidth}px`;
+                tile.style.height = `${tileHeight}px`;
+                tile.style.left = `${x}px`;
+                tile.style.top = `${y}px`;
+                tile.style.backgroundImage = `url(${src})`;
+                layer.appendChild(tile);
+                markPlaced(r, c, chosen.w, chosen.h);
+            });
+        }
+
+        let tileTimer = null;
+
+        function scheduleTiles() {
+            if (tileTimer) {
+                clearTimeout(tileTimer);
+            }
+            tileTimer = setTimeout(() => {
+                requestAnimationFrame(buildTiles);
+            }, 120);
+        }
+
+        function setServerIcon(dataUrl) {
+            const icon = document.getElementById("server-icon");
+            const baseIcon = document.getElementById("base-icon");
+            if (!icon) return;
+            if (dataUrl) {
+                icon.src = dataUrl;
+                icon.style.opacity = "1";
+                if (baseIcon) {
+                    baseIcon.style.opacity = "0";
+                }
+            } else {
+                icon.removeAttribute("src");
+                icon.style.opacity = "0";
+                if (baseIcon) {
+                    baseIcon.style.opacity = "1";
+                }
+            }
+        }
+
+        function reloadActiveStyle() {
+            const link = document.querySelector('link[href*="active_base_style.css"]');
+            if (!link) return;
+            const base = link.href.split('?')[0];
+            link.href = `${base}?v=${Date.now()}`;
+        }
+
+        // Helper function to update server list
+        function updateServerList(servers) {
+            const list = document.getElementById('server-list');
+            if (!list) return;
+
+            list.innerHTML = '';
+
+            window.__serverMap = {};
+            
+            if (servers.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'server-empty';
+                empty.textContent = 'No servers available';
+                list.appendChild(empty);
+                return;
+            }
+            
+            servers.forEach(server => {
+                const entry = document.createElement('div');
+                entry.className = 'server-entry';
+                entry.style.cursor = 'pointer';
+
+                const star = document.createElement('div');
+                star.className = 'server-star';
+                const isFavorite = server.source === 'favorite' || server.source === 'manual';
+                star.textContent = isFavorite ? '*' : '';
+                star.onclick = (event) => {
+                    event.stopPropagation();
+                    const next = !isFavorite;
+                    if (window.pybridge) {
+                        window.pybridge.call('toggleFavorite', JSON.stringify({
+                            ip: server.ip,
+                            port: server.port,
+                            is_favorite: next
+                        }));
+                    }
+                };
+
+                const status = document.createElement('div');
+                status.className = 'server-status-dot';
+                if (server.players > 0) {
+                    status.classList.add('online');
+                }
+
+                const main = document.createElement('div');
+                main.className = 'server-main';
+
+                const name = document.createElement('div');
+                name.className = 'server-name';
+                name.textContent = server.name;
+
+                const meta = document.createElement('div');
+                meta.className = 'server-meta';
+
+                const ip = document.createElement('span');
+                ip.className = 'server-ip';
+                ip.textContent = `${server.ip}:${server.port}`;
+
+                const players = document.createElement('span');
+                players.className = 'server-players';
+                players.textContent = `${server.players}/${server.max_players}`;
+
+                meta.appendChild(ip);
+                meta.appendChild(players);
+                main.appendChild(name);
+                main.appendChild(meta);
+
+                entry.appendChild(star);
+                entry.appendChild(status);
+                entry.appendChild(main);
+
+                const hint = document.createElement('div');
+                hint.className = 'server-controller-hint';
+                hint.innerHTML = `
+                  <img class="hint-up" src="assets/images/controller/dpad_up.png" alt="">
+                  <img class="hint-down" src="assets/images/controller/dpad_down.png" alt="">
+                `;
+                entry.appendChild(hint);
+
+                entry.onclick = () => {
+                    document.querySelectorAll('.server-entry.active')
+                        .forEach(node => node.classList.remove('active'));
+                    entry.classList.add('active');
+                    if (window.pybridge) {
+                        window.pybridge.call('selectServer', JSON.stringify({
+                            ip: server.ip,
+                            port: server.port
+                        }));
+                    }
+                };
+                list.appendChild(entry);
+                window.__serverMap[`${server.ip}:${server.port}`] = server;
+            });
+            resetControllerFocus();
+        }
+
+        let controllerIndex = 0;
+        let controllerButtons = {};
+        let controllerEnabled = true;
+        let controllerSuppressUntil = 0;
+        let lastInputMode = "mouse";
+
+        function setInputMode(mode, force = false) {
+            if (!force && mode === lastInputMode) return;
+            lastInputMode = mode;
+            if (mode === "gamepad") {
+                document.body.classList.add("controller-visible");
+            } else {
+                document.body.classList.remove("controller-visible", "controller-active");
+            }
+        }
+
+        function getServerEntries() {
+            return Array.from(document.querySelectorAll('.server-entry'));
+        }
+
+        function resetControllerFocus() {
+            const entries = getServerEntries();
+            controllerIndex = 0;
+            if (entries.length) {
+                setControllerFocus(controllerIndex, true);
+            }
+        }
+
+        function setControllerFocus(index, activate) {
+            const entries = getServerEntries();
+            entries.forEach(entry => entry.classList.remove('controller-focus', 'controller-prev', 'controller-next'));
+            if (!entries.length) return;
+            const clamped = Math.max(0, Math.min(index, entries.length - 1));
+            controllerIndex = clamped;
+            const entry = entries[controllerIndex];
+            entry.classList.add('controller-focus');
+            if (controllerIndex > 0) {
+                entries[controllerIndex - 1].classList.add('controller-prev');
+            }
+            if (controllerIndex < entries.length - 1) {
+                entries[controllerIndex + 1].classList.add('controller-next');
+            }
+            entry.scrollIntoView({ block: "nearest" });
+            if (activate) {
+                entry.click();
+            }
+        }
+
+        function startControllerLoop() {
+            if (!navigator.getGamepads) return;
+
+            function setControllerHintsActive(active) {
+                document.body.classList.toggle("controller-active", active);
+            }
+
+            function step(timestamp) {
+                if (!controllerEnabled) {
+                    requestAnimationFrame(step);
+                    return;
+                }
+                if (controllerSuppressUntil && timestamp < controllerSuppressUntil) {
+                    requestAnimationFrame(step);
+                    return;
+                }
+                if (!document.hasFocus()) {
+                    requestAnimationFrame(step);
+                    return;
+                }
+                const pads = navigator.getGamepads();
+                const pad = pads && pads[0];
+                if (pad) {
+                    const hasInput = pad.buttons.some(btn => btn.pressed) ||
+                        pad.axes.some(axis => Math.abs(axis) > 0.4);
+                    if (hasInput) {
+                        setInputMode("gamepad");
+                    }
+                    setControllerHintsActive(hasInput);
+                    handleButton(pad, 12, timestamp, () => setControllerFocus(controllerIndex - 1, true));
+                    handleButton(pad, 13, timestamp, () => setControllerFocus(controllerIndex + 1, true));
+                    handleButton(pad, 9, timestamp, () => {
+                        if (window.pybridge) window.pybridge.call("play", "");
+                    }, 300);
+                    handleButton(pad, 8, timestamp, () => {
+                        if (window.pybridge) window.pybridge.call("settings", "");
+                    }, 300);
+                    handleButton(pad, 2, timestamp, () => {
+                        if (window.pybridge) window.pybridge.call("refresh", "");
+                    }, 300);
+                    handleButton(pad, 3, timestamp, () => {
+                        if (window.pybridge) window.pybridge.call("add", "");
+                    }, 300);
+                    handleButton(pad, 0, timestamp, () => {
+                        setControllerFocus(controllerIndex, true);
+                    }, 300);
+                }
+                requestAnimationFrame(step);
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        function setControllerEnabled(enabled) {
+            controllerEnabled = !!enabled;
+            if (!controllerEnabled) {
+                document.body.classList.remove("controller-active", "controller-visible");
+                controllerButtons = {};
+            } else {
+                controllerButtons = {};
+                controllerSuppressUntil = performance.now() + 300;
+                setInputMode(lastInputMode, true);
+            }
+        }
+
+        function handleButton(pad, index, timestamp, action, repeatMs = 160) {
+            const btn = pad.buttons[index];
+            if (!btn) return;
+            const pressed = !!btn.pressed;
+            const last = controllerButtons[index] || 0;
+            if (pressed) {
+                if (!last) {
+                    controllerButtons[index] = timestamp;
+                }
+                return;
+            }
+            if (last && timestamp - last >= repeatMs) {
+                controllerButtons[index] = 0;
+                action();
+            }
+        }
+        
+        window.addEventListener("load", () => {
+            scheduleTiles();
+            startControllerLoop();
+        });
+        window.addEventListener("resize", scheduleTiles);
+
+        window.addEventListener("gamepadconnected", () => {
+            // wait for input before showing hints
+        });
+
+        window.addEventListener("gamepaddisconnected", () => {
+            const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+            const stillConnected = Array.from(pads || []).some(pad => pad);
+            if (!stillConnected) {
+                document.body.classList.remove("controller-visible", "controller-active");
+            }
+        });
+
+        function markPointerInput() {
+            setInputMode("mouse");
+        }
+
+        ["mousemove", "mousedown", "wheel", "keydown", "touchstart"].forEach(evt => {
+            window.addEventListener(evt, markPointerInput, { passive: true });
+        });
+    </script>
+
+</body>
+</html>

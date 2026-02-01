@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="assets/styles/active_base_style.css">
+    <link rel="stylesheet" href="assets/styles/settings.css">
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div id="top-bar" class="drag">
+        <span id="title">Settings</span>
+
+        <div id="window-controls">
+            <img class="controller-inline controller-select" src="assets/images/controller/select.png" alt="">
+            <button class="window-control-btn" data-event="close" aria-label="Close">
+                <img src="assets/images/close.png" alt="">
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        <div class="setting-group">
+            <label>Game Launcher</label>
+            <div class="toggle-group">
+                <button id="launcher-steam" class="toggle-btn" data-launcher="steam">Steam</button>
+                <button id="launcher-rockstar" class="toggle-btn" data-launcher="rockstar">Rockstar</button>
+            </div>
+            <input type="hidden" id="launcher-value" value="steam">
+            <p class="hint">Select which launcher you use to play Bully</p>
+        </div>
+        <div class="setting-group">
+            <label>Only Show</label>
+            <label class="checkbox-line">
+                <input type="checkbox" id="only-important">
+                <span>Important</span>
+            </label>
+            <p class="hint">Only things that have been in the list for a while.</p>
+            <label class="checkbox-line">
+                <input type="checkbox" id="only-trusted">
+                <span>Trusted</span>
+            </label>
+            <p class="hint">Manually trusted servers.</p>
+            <label class="checkbox-line">
+                <input type="checkbox" id="only-others">
+                <span>Others</span>
+            </label>
+            <p class="hint">Everything else that's not banned.</p>
+        </div>
+
+        <div class="setting-group" id="steam-settings" style="display: none;">
+            <div id="steam-exe-group">
+                <label id="steam-exe-label">Steam Executable Location</label>
+                <div class="folder-input-group">
+                    <input type="text" id="steam-exe-input" placeholder="Auto-detected or select manually..." readonly>
+                    <button id="browse-steam-btn" class="btn-side">Browse</button>
+                </div>
+                <p class="hint" id="steam-exe-hint">Path to steam.exe (usually auto-detected)</p>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <label class="checkbox-line">
+                    <input type="checkbox" id="steam-uri-mode">
+                    <span>Use Steam URI mode</span>
+                </label>
+                <p class="hint warning">WARNING: Launch options and your username/password will be visible on screen.</p>
+            </div>
+        </div>
+
+        <div class="setting-group" id="rockstar-settings" style="display: none;">
+            <label>Rockstar Launcher Executable Location</label>
+            <div class="folder-input-group">
+                <input type="text" id="launcher-exe-input" placeholder="Auto-detected or select manually..." readonly>
+                <button id="browse-launcher-btn" class="btn-side">Browse</button>
+            </div>
+            <p class="hint">Path to Launcher.exe (usually auto-detected)</p>
+        </div>
+
+        <div class="setting-group" id="game-folder-group" style="display: none;">
+            <label>Game Installation Folder</label>
+            <div class="folder-input-group">
+            <input type="text" id="folder-input" placeholder="C:/Program Files/Rockstar Games/Bully Scholarship Edition" readonly>
+                <button id="browse-btn" class="btn-side">Browse</button>
+            </div>
+            <p class="hint">Select the folder where Bully: Scholarship Edition is installed</p>
+        </div>
+        <div class="setting-group" id="list-settings">
+            <label>Server List URL</label>
+            <input type="text" id="list-url-input" placeholder="https://bsb.seeks.men/list">
+            <p class="hint">Custom list endpoint (Cloudflare worker or similar)</p>
+            <button id="admin-btn" class="btn-side">Admin List</button>
+            <button id="update-btn" class="btn-side">Check for Updates</button>
+        </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div id="bottom-bar">
+        <div id="social-links">
+            <button id="github-btn" class="social-btn" aria-label="GitHub">
+                <img src="assets/images/github.png" alt="">
+            </button>
+            <button id="discord-btn" class="social-btn" aria-label="Discord">
+                <img src="assets/images/discord.png" alt="">
+            </button>
+        </div>
+
+        <div id="save-group">
+            <img class="controller-inline controller-start" src="assets/images/controller/start.png" alt="">
+            <button id="save-btn" class="btn-hero">Save</button>
+        </div>
+    </div>
+
+    <script>
+        function initBridge() {
+            if (window.pybridge || window._pybridgeReady) return;
+            if (typeof QWebChannel === "undefined" || typeof qt === "undefined" || !qt.webChannelTransport) {
+                return;
+            }
+            window._pybridgeReady = true;
+            new QWebChannel(qt.webChannelTransport, function (channel) {
+                window.pybridge = channel.objects.pybridge;
+            });
+        }
+
+        function setLauncherValue(value) {
+            const launcherValue = document.getElementById('launcher-value');
+            const steamBtn = document.getElementById('launcher-steam');
+            const rockstarBtn = document.getElementById('launcher-rockstar');
+            const steamSettings = document.getElementById('steam-settings');
+            const rockstarSettings = document.getElementById('rockstar-settings');
+            const folderGroup = document.getElementById('game-folder-group');
+
+            launcherValue.value = value;
+            steamBtn.classList.toggle('active', value === 'steam');
+            rockstarBtn.classList.toggle('active', value === 'rockstar');
+
+            steamSettings.style.display = value === 'steam' ? 'block' : 'none';
+            rockstarSettings.style.display = value === 'rockstar' ? 'block' : 'none';
+            folderGroup.style.display = value === 'rockstar' ? 'block' : 'none';
+            updateSteamExeVisibility();
+        }
+
+        function updateSteamExeVisibility() {
+            const uriToggle = document.getElementById('steam-uri-mode');
+            const exeGroup = document.getElementById('steam-exe-group');
+            if (!exeGroup) return;
+            const hide = !!(uriToggle && uriToggle.checked);
+            exeGroup.style.display = hide ? 'none' : 'block';
+        }
+
+        let systemIsLinux = false;
+
+        function updateSteamExeLabel() {
+            const isLinux = systemIsLinux;
+            const label = document.getElementById('steam-exe-label');
+            const hint = document.getElementById('steam-exe-hint');
+            if (!label || !hint) return;
+            if (isLinux) {
+                label.textContent = 'Steam File Location';
+                hint.textContent = 'Path to your Steam file (e.g. ~/.steam/steam or steam.sh)';
+            } else {
+                label.textContent = 'Steam Executable Location';
+                hint.textContent = 'Path to steam.exe (usually auto-detected)';
+            }
+        }
+
+        function setupButtons() {
+            initBridge();
+            document.getElementById('launcher-steam').onclick = () => setLauncherValue('steam');
+            document.getElementById('launcher-rockstar').onclick = () => setLauncherValue('rockstar');
+            document.getElementById('steam-uri-mode').onchange = updateSteamExeVisibility;
+
+            // Browse game folder
+            document.getElementById('browse-btn').onclick = function() {
+                if (window.pybridge) {
+                    window.pybridge.call('browseGameFolder', '');
+                }
+            };
+
+            // Browse Steam exe
+            document.getElementById('browse-steam-btn').onclick = function() {
+                if (window.pybridge) {
+                    window.pybridge.call('browseSteamExe', '');
+                }
+            };
+
+            // Browse Launcher exe
+            document.getElementById('browse-launcher-btn').onclick = function() {
+                if (window.pybridge) {
+                    window.pybridge.call('browseLauncherExe', '');
+                }
+            };
+
+            // Save button
+            document.getElementById('save-btn').onclick = function() {
+                const folder = document.getElementById('folder-input').value;
+                const launcher = document.getElementById('launcher-value').value;
+                const steamExe = document.getElementById('steam-exe-input').value;
+                const launcherExe = document.getElementById('launcher-exe-input').value;
+                const isLinux = systemIsLinux;
+                const uriMode = document.getElementById('steam-uri-mode').checked;
+                const listUrl = document.getElementById('list-url-input').value;
+                const onlyImportant = document.getElementById('only-important').checked;
+                const onlyTrusted = document.getElementById('only-trusted').checked;
+                const onlyOthers = document.getElementById('only-others').checked;
+
+                const data = JSON.stringify({
+                    folder,
+                    launcher,
+                    steamExe,
+                    launcherExe,
+                    isLinux,
+                    uriMode,
+                    listUrl,
+                    onlyImportant,
+                    onlyTrusted,
+                    onlyOthers
+                });
+
+                if (window.pybridge) {
+                    window.pybridge.call('save', data);
+                }
+            };
+
+            document.getElementById('admin-btn').onclick = function() {
+                initBridge();
+                if (window.pybridge) {
+                    window.pybridge.call('openAdmin', '');
+                }
+            };
+
+            document.getElementById('update-btn').onclick = function() {
+                initBridge();
+                if (window.pybridge) {
+                    window.pybridge.call('openUpdate', '');
+                }
+            };
+
+            // GitHub button
+            document.getElementById('github-btn').onclick = function() {
+                if (window.pybridge) {
+                    window.pybridge.call('openGithub', '');
+                }
+            };
+
+            // Discord button
+            document.getElementById('discord-btn').onclick = function() {
+                if (window.pybridge) {
+                    window.pybridge.call('openDiscord', '');
+                }
+            };
+        }
+
+        // Set values from Python
+        function setFolderPath(path) {
+            document.getElementById('folder-input').value = path;
+        }
+
+        function setLauncher(launcher) {
+            setLauncherValue(launcher || 'steam');
+        }
+
+        function setSteamExe(path) {
+            document.getElementById('steam-exe-input').value = path;
+        }
+
+        function setLauncherExe(path) {
+            document.getElementById('launcher-exe-input').value = path;
+        }
+
+        function setLinux(isLinux) {
+            systemIsLinux = !!isLinux;
+            updateSteamExeLabel();
+        }
+
+        function setUriMode(enabled) {
+            document.getElementById('steam-uri-mode').checked = !!enabled;
+            updateSteamExeVisibility();
+        }
+
+        function setListUrl(url) {
+            document.getElementById('list-url-input').value = url || '';
+        }
+
+        function setSystemLinux(isLinux) {
+            const rockstarBtn = document.getElementById('launcher-rockstar');
+            const rockstarSettings = document.getElementById('rockstar-settings');
+            const folderGroup = document.getElementById('game-folder-group');
+            if (isLinux) {
+                if (rockstarBtn) rockstarBtn.style.display = 'none';
+                if (rockstarSettings) rockstarSettings.style.display = 'none';
+                if (folderGroup) folderGroup.style.display = 'none';
+                setLauncherValue('steam');
+                systemIsLinux = true;
+                updateSteamExeLabel();
+            } else {
+                if (rockstarBtn) rockstarBtn.style.display = '';
+                systemIsLinux = false;
+            }
+        }
+
+        function setOnlyFilters(filters) {
+            const only = filters || {};
+            document.getElementById('only-important').checked = !!only.important;
+            document.getElementById('only-trusted').checked = !!only.trusted;
+            document.getElementById('only-others').checked = !!only.others;
+        }
+
+        let controllerIndex = 0;
+        let controllerButtons = {};
+        let lastInputMode = "mouse";
+
+        function setInputMode(mode) {
+            if (mode === lastInputMode) return;
+            lastInputMode = mode;
+            if (mode === "gamepad") {
+                document.body.classList.add("controller-visible");
+            } else {
+                document.body.classList.remove("controller-visible");
+            }
+        }
+
+        function getFocusableElements() {
+            const selectors = [
+                "button",
+                "input",
+                "select",
+                "textarea",
+                "[tabindex]:not([tabindex='-1'])"
+            ];
+            return Array.from(document.querySelectorAll(selectors.join(",")))
+                .filter(el => !el.disabled && el.offsetParent !== null);
+        }
+
+        function setControllerFocus(index) {
+            const items = getFocusableElements();
+            items.forEach(el => el.classList.remove("controller-focus"));
+            if (!items.length) return;
+            const clamped = Math.max(0, Math.min(index, items.length - 1));
+            controllerIndex = clamped;
+            const target = items[controllerIndex];
+            target.classList.add("controller-focus");
+            target.focus({ preventScroll: true });
+            target.scrollIntoView({ block: "nearest" });
+        }
+
+        function handleButton(pad, index, timestamp, action, repeatMs = 160) {
+            const btn = pad.buttons[index];
+            if (!btn) return;
+            const pressed = !!btn.pressed;
+            const last = controllerButtons[index] || 0;
+            if (pressed) {
+                if (!last) {
+                    controllerButtons[index] = timestamp;
+                }
+                return;
+            }
+            if (last && timestamp - last >= repeatMs) {
+                controllerButtons[index] = 0;
+                action();
+            }
+        }
+
+        function startControllerLoop() {
+            if (!navigator.getGamepads) return;
+            function step(timestamp) {
+                if (!document.hasFocus()) {
+                    requestAnimationFrame(step);
+                    return;
+                }
+                const pads = navigator.getGamepads();
+                const pad = pads && pads[0];
+                if (pad) {
+                    const hasInput = pad.buttons.some(btn => btn.pressed) ||
+                        pad.axes.some(axis => Math.abs(axis) > 0.4);
+                    if (hasInput) {
+                        setInputMode("gamepad");
+                    }
+                    handleButton(pad, 9, timestamp, () => {
+                        const saveBtn = document.getElementById("save-btn");
+                        if (saveBtn) saveBtn.click();
+                    }, 300);
+                    handleButton(pad, 8, timestamp, () => {
+                        if (window.pybridge) window.pybridge.call("close", "");
+                    }, 300);
+                    handleButton(pad, 0, timestamp, () => {
+                        const active = document.activeElement;
+                        if (active && typeof active.click === "function") {
+                            active.click();
+                        }
+                    }, 300);
+                    handleButton(pad, 12, timestamp, () => setControllerFocus(controllerIndex - 1), 160);
+                    handleButton(pad, 13, timestamp, () => setControllerFocus(controllerIndex + 1), 160);
+                }
+                requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function enableDrag() {
+            const dragEl = document.querySelector(".drag");
+            if (!dragEl) return;
+            let dragging = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            dragEl.addEventListener("mousedown", (e) => {
+                if (e.button !== 0) return;
+                if (e.target.closest("button") || e.target.closest("[data-event]")) return;
+                dragging = true;
+                lastX = e.screenX;
+                lastY = e.screenY;
+            });
+
+            document.addEventListener("mouseup", () => {
+                dragging = false;
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!dragging || !window.pybridge) return;
+                const dx = e.screenX - lastX;
+                const dy = e.screenY - lastY;
+                lastX = e.screenX;
+                lastY = e.screenY;
+                window.pybridge.call("dragMove", dx + "," + dy);
+            });
+        }
+
+        function updateControllerPresence() {
+            const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+            const hasPad = Array.from(pads || []).some(pad => pad);
+            if (!hasPad) {
+                setInputMode("mouse");
+            }
+        }
+
+        window.addEventListener("gamepadconnected", () => {
+            // wait for input to show
+        });
+        window.addEventListener("gamepaddisconnected", updateControllerPresence);
+
+        function markPointerInput() {
+            setInputMode("mouse");
+        }
+
+        ["mousemove", "mousedown", "wheel", "keydown", "touchstart"].forEach(evt => {
+            window.addEventListener(evt, markPointerInput, { passive: true });
+        });
+
+        setTimeout(() => {
+            setupButtons();
+            setLauncherValue('steam');
+            setControllerFocus(0);
+            startControllerLoop();
+            updateControllerPresence();
+            updateSteamExeLabel();
+            enableDrag();
+        }, 100);
+    </script>
+
+</body>
+</html>
+

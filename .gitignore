@@ -1,0 +1,12 @@
+build/
+dist/
+package/out/
+__pycache__/
+*.py[cod]
+*.sqlite
+*.sqlite3
+*.db
+*.log
+.cache/
+.pytest_cache/
+.dssb_server_browser/

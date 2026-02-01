@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Update</title>
+    <link rel="stylesheet" href="assets/styles/active_base_style.css">
+    <link rel="stylesheet" href="assets/styles/update.css">
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+</head>
+<body>
+    <div id="top-bar" class="drag">
+        <span id="title">Update</span>
+        <div id="window-controls">
+            <button class="window-control-btn" data-event="close" aria-label="Close">
+                <img src="assets/images/close.png" alt="">
+            </button>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="panel">
+            <div class="row">
+                <span class="label">Current Version</span>
+                <span id="current-version">--</span>
+            </div>
+            <div class="row">
+                <span class="label">Latest Version</span>
+                <span id="latest-version">--</span>
+            </div>
+            <div class="status" id="status-text">Ready to check.</div>
+        </div>
+    </div>
+
+    <div id="bottom-bar">
+        <button id="check-btn" class="btn-hero" data-event="check">Check</button>
+        <button id="open-btn" class="btn-side" data-event="openReleases" disabled>Open Releases</button>
+    </div>
+
+    <script>
+        function setCurrentVersion(value) {
+            const el = document.getElementById("current-version");
+            if (el) el.textContent = value || "--";
+        }
+
+        function setLatestVersion(value) {
+            const el = document.getElementById("latest-version");
+            if (el) el.textContent = value || "--";
+        }
+
+        function setStatus(text) {
+            const el = document.getElementById("status-text");
+            if (el) el.textContent = text || "";
+        }
+
+        function setUpdateAvailable(available) {
+            const btn = document.getElementById("open-btn");
+            if (btn) btn.disabled = !available;
+        }
+    </script>
+</body>
+</html>
