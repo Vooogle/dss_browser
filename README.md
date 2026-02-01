@@ -1,7 +1,9 @@
 # DSS Browser
 
 This is a browser for Derpy Script Servers, for players who run Derpy Script Loader.  
-Derpy Script Loader/Server Download Links: [nexus](https://www.nexusmods.com/bullyscholarshipedition/mods/43) · [mediafire](https://www.mediafire.com/folder/clgtvlrnat179/derpy's_script_loader)
+Derpy Script Loader/Server Download Links: [nexus](https://www.nexusmods.com/bullyscholarshipedition/mods/43) - [mediafire](https://www.mediafire.com/folder/clgtvlrnat179/derpy's_script_loader)
+
+Bully Server Community Discord: [https://discord.gg/RHrsCx2acS](https://discord.gg/RHrsCx2acS)
 
 <div>
   <img src="README/assets/blank_ss.png" width="360" alt="blank_ss">
@@ -20,20 +22,19 @@ DSS Browser supports both Steam and Rockstar Games Launcher versions of Bully.
 
    **Rockstar Launcher**
    - Select Rockstar.  
-     <img src="README/assets/rgl_1_ss.png" width="360" alt="select_rockstar"><br><br>
+     <img src="README/assets/rgl_1_ss.png" width="360" alt="select_rockstar"><br>
    - Open `Launcher.exe` and select the Bully: Scholarship Edition folder.  
-     <img src="README/assets/rgl_2_ss.png" width="360" alt="rockstar_paths"><br><br>
-
+     <img src="README/assets/rgl_2_ss.png" width="360" alt="rockstar_paths"><br>
    **Steam**
    - Select Steam.  
-     <img src="README/assets/steam_1_ss.png" width="360" alt="select_steam"><br><br>
+     <img src="README/assets/steam_1_ss.png" width="360" alt="select_steam"><br>
    - Open `Steam.exe` (or the Steam file on Linux).  
-     <img src="README/assets/steam_2_ss.png" width="360" alt="steam_path"><br><br>
+     <img src="README/assets/steam_2_ss.png" width="360" alt="steam_path"><br>
 5. Add a server or select one from the list, add your credentials and play.
 
 ## Controller Support
 
-Controllers are supported.
+Controllers are supported for selecting a server, but no typing ability or closing the window.
 
 <img src="README/assets/controller_ss.png" width="360" alt="controller_ss">
 
