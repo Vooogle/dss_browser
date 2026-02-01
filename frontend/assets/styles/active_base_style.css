@@ -46,15 +46,15 @@ p, li, .title-basic {
 -------------------------- */
 
 :root {
-  --bsb-primary-light: #1a7bd1;
-  --bsb-primary: #0d63aa;
-  --bsb-primary-dark: #093c6d;
-  --bsb-primary-darker: #00223e;
+  --bsb-primary-light: #7bd69a;
+  --bsb-primary: #2f9f5f;
+  --bsb-primary-dark: #1f6f45;
+  --bsb-primary-darker: #0f3a24;
 
-  --bsb-highlight-light: #ffd633;
-  --bsb-highlight: #ffba00;
-  --bsb-highlight-dark: #cc9900;
+  --bsb-highlight-light: #d6f2c6;
+  --bsb-highlight: #7fd36b;
+  --bsb-highlight-dark: #4fa04a;
 
-  --bsb-text: #ffffff;
-  --bsb-text-muted: #cfcfcf;
+  --bsb-text: #f6fff8;
+  --bsb-text-muted: #cfe6d6;
 }

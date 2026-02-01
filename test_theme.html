@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DSS Browser Theme Test</title>
+  <style>
+    :root {
+      --bsb-primary-light: #7bd69a;
+      --bsb-primary: #2f9f5f;
+      --bsb-primary-dark: #1f6f45;
+      --bsb-primary-darker: #0f3a24;
+
+      --bsb-highlight-light: #d6f2c6;
+      --bsb-highlight: #7fd36b;
+      --bsb-highlight-dark: #4fa04a;
+
+      --bsb-text: #f6fff8;
+      --bsb-text-muted: #cfe6d6;
+    }
+    body {
+      margin: 0;
+      font-family: "Google Sans Flex", sans-serif;
+      background: var(--bsb-primary-darker);
+      color: var(--bsb-text);
+    }
+    header {
+      padding: 16px 20px;
+      border-bottom: 3px solid var(--bsb-highlight);
+    }
+    .wrap {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+    .panel {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--bsb-primary-dark);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px 12px;
+      border: 2px solid var(--bsb-primary-dark);
+      background: var(--bsb-primary);
+      color: var(--bsb-text);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.alt {
+      background: var(--bsb-highlight);
+      color: var(--bsb-primary-darker);
+      border-color: var(--bsb-highlight-dark);
+    }
+    .swatch {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .swatch div {
+      height: 48px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.3);
+    }
+    .sample {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bsb-primary-dark);
+      border: 1px solid var(--bsb-primary-darker);
+      border-radius: 8px;
+    }
+    code {
+      background: rgba(0,0,0,0.35);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Theme Switch Test</h1>
+    <div>Click a preset to update CSS variables live.</div>
+  </header>
+  <div class="wrap">
+    <div class="panel">
+      <button class="btn" onclick="applyTheme('ocean')">Ocean</button>
+      <button class="btn" onclick="applyTheme('sunset')">Sunset</button>
+      <button class="btn" onclick="applyTheme('forest')">Forest</button>
+      <button class="btn" onclick="applyTheme('mono')">Mono</button>
+      <button class="btn alt" onclick="resetTheme()">Reset to Base</button>
+      <div class="sample">
+        <div><strong>Primary</strong> <code id="primary-val"></code></div>
+        <div><strong>Highlight</strong> <code id="highlight-val"></code></div>
+        <div><strong>Text</strong> <code id="text-val"></code></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Swatches</h3>
+      <div class="swatch">
+        <div id="swatch-1"></div>
+        <div id="swatch-2"></div>
+        <div id="swatch-3"></div>
+        <div id="swatch-4"></div>
+      </div>
+      <div class="sample" style="margin-top: 16px;">
+        This block uses <code>--bsb-primary-dark</code> and <code>--bsb-text</code>.
+      </div>
+      <div class="sample" style="margin-top: 12px; background: var(--bsb-highlight); color: var(--bsb-primary-darker);">
+        Highlight sample uses <code>--bsb-highlight</code>.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const presets = {
+      ocean: {
+        "--bsb-primary-light": "#6fd3ff",
+        "--bsb-primary": "#1a8fd6",
+        "--bsb-primary-dark": "#0f5f92",
+        "--bsb-primary-darker": "#06324d",
+        "--bsb-highlight-light": "#c6f0ff",
+        "--bsb-highlight": "#69d2ff",
+        "--bsb-highlight-dark": "#2a9fda",
+        "--bsb-text": "#ffffff",
+        "--bsb-text-muted": "#cfe7f4"
+      },
+      sunset: {
+        "--bsb-primary-light": "#ffb48a",
+        "--bsb-primary": "#ff7b4a",
+        "--bsb-primary-dark": "#c24a23",
+        "--bsb-primary-darker": "#5f1d0b",
+        "--bsb-highlight-light": "#ffe1b8",
+        "--bsb-highlight": "#ffb347",
+        "--bsb-highlight-dark": "#d9842d",
+        "--bsb-text": "#ffffff",
+        "--bsb-text-muted": "#f1d2c6"
+      },
+      forest: {
+        "--bsb-primary-light": "#7bd69a",
+        "--bsb-primary": "#2f9f5f",
+        "--bsb-primary-dark": "#1f6f45",
+        "--bsb-primary-darker": "#0f3a24",
+        "--bsb-highlight-light": "#d6f2c6",
+        "--bsb-highlight": "#7fd36b",
+        "--bsb-highlight-dark": "#4fa04a",
+        "--bsb-text": "#f6fff8",
+        "--bsb-text-muted": "#cfe6d6"
+      },
+      mono: {
+        "--bsb-primary-light": "#c8c8c8",
+        "--bsb-primary": "#8f8f8f",
+        "--bsb-primary-dark": "#5a5a5a",
+        "--bsb-primary-darker": "#2a2a2a",
+        "--bsb-highlight-light": "#f2f2f2",
+        "--bsb-highlight": "#bdbdbd",
+        "--bsb-highlight-dark": "#8c8c8c",
+        "--bsb-text": "#ffffff",
+        "--bsb-text-muted": "#d4d4d4"
+      }
+    };
+
+    const root = document.documentElement;
+    let baseSnapshot = null;
+
+    function snapshotBase() {
+      if (baseSnapshot) return;
+      baseSnapshot = {};
+      Object.keys(presets.ocean).forEach((key) => {
+        baseSnapshot[key] = getComputedStyle(root).getPropertyValue(key).trim();
+      });
+    }
+
+    function applyTheme(name) {
+      snapshotBase();
+      const theme = presets[name];
+      Object.entries(theme).forEach(([key, value]) => {
+        root.style.setProperty(key, value);
+      });
+      updateSwatches();
+    }
+
+    function resetTheme() {
+      if (!baseSnapshot) return;
+      Object.entries(baseSnapshot).forEach(([key, value]) => {
+        root.style.setProperty(key, value);
+      });
+      updateSwatches();
+    }
+
+    function updateSwatches() {
+      const styles = getComputedStyle(root);
+      document.getElementById("swatch-1").style.background = styles.getPropertyValue("--bsb-primary").trim();
+      document.getElementById("swatch-2").style.background = styles.getPropertyValue("--bsb-primary-dark").trim();
+      document.getElementById("swatch-3").style.background = styles.getPropertyValue("--bsb-highlight").trim();
+      document.getElementById("swatch-4").style.background = styles.getPropertyValue("--bsb-highlight-light").trim();
+      document.getElementById("primary-val").textContent = styles.getPropertyValue("--bsb-primary").trim();
+      document.getElementById("highlight-val").textContent = styles.getPropertyValue("--bsb-highlight").trim();
+      document.getElementById("text-val").textContent = styles.getPropertyValue("--bsb-text").trim();
+    }
+
+    applyTheme("forest");
+  </script>
+</body>
+</html>
