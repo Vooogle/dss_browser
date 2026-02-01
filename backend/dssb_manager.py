@@ -48,20 +48,28 @@ class DSSBManager:
     
     # ========== Server Management ==========
     
-    def add_manual_server(self, ip: str, port: int, website: Optional[str] = None) -> bool:
+    def add_manual_server(
+        self,
+        ip: str,
+        port: int,
+        website: Optional[str] = None,
+        validate: bool = True,
+        timeout: int = 5
+    ) -> bool:
         """
-        Add a server manually and immediately query it.
+        Add a server manually, optionally validating it first.
         
         Returns:
-            True if server was added and validated successfully
+            True if server was added successfully
         """
         try:
-            # Query the server first to validate
-            server_info = query_dss(ip, port, timeout=5)
-            
-            # Add to database
+            server_info = None
+            if validate:
+                server_info = query_dss(ip, port, timeout=timeout)
+
             self.servers.add_server(ip, port, source="manual", website=website)
-            self.servers.update_server_info(ip, port, server_info)
+            if server_info:
+                self.servers.update_server_info(ip, port, server_info)
             
             self._trigger_ui_callback("server_list_updated")
             return True

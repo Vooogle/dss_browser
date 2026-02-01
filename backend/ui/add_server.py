@@ -31,7 +31,7 @@ def create_add_server_dialog(dssb_manager, on_server_added=None):
 
     dialog = HTMLWindow(
         html_path=html_path,
-        size=(400, 300),
+        size=(400, 360),
         enable_drag=False,
         callbacks=callbacks
     )
@@ -62,6 +62,7 @@ def handle_save(dssb_manager, dialog, data, on_server_added):
         ip = server_data.get("ip", "").strip()
         port_str = server_data.get("port", "").strip()
         website = server_data.get("website", "").strip()
+        skip_validation = bool(server_data.get("skip_validation", False))
         
         # Validate IP
         if not ip:
@@ -88,7 +89,12 @@ def handle_save(dssb_manager, dialog, data, on_server_added):
         print(f"Adding server: {ip}:{port} (website: {website})")
         
         # Add server to database
-        success = dssb_manager.add_manual_server(ip, port, website=website)
+        success = dssb_manager.add_manual_server(
+            ip,
+            port,
+            website=website,
+            validate=not skip_validation
+        )
         
         if success:
             print(f"Server {ip}:{port} added successfully")

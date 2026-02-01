@@ -102,6 +102,30 @@ body {
     font-family: "Google Sans Flex", sans-serif;
 }
 
+.form-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    margin: 0;
+    accent-color: var(--bsb-highlight);
+    border: 2px solid var(--bsb-primary-darker);
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-family: "Orelega One", serif;
+}
+
+.helper-text {
+    color: var(--bsb-text-muted);
+    font-size: 12px;
+    font-family: "Google Sans Flex", sans-serif;
+}
+
 .form-group input:focus {
     outline: none;
     border-color: var(--bsb-highlight-dark);

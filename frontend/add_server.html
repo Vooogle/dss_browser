@@ -37,6 +37,14 @@
             <label for="website-input">Website</label>
             <input type="text" id="website-input" placeholder="Optional">
         </div>
+
+        <div class="form-group">
+            <label class="checkbox-row">
+                <input type="checkbox" id="skip-validation">
+                Add even if offline
+            </label>
+            <div class="helper-text">Skips the initial connection check.</div>
+        </div>
     </div>
 
     <!-- Bottom Bar -->
@@ -66,8 +74,9 @@
                 const ip = document.getElementById('ip-input').value.trim();
                 const port = document.getElementById('port-input').value.trim();
                 const website = document.getElementById('website-input').value.trim();
+                const skip_validation = document.getElementById('skip-validation').checked;
 
-                const data = JSON.stringify({ ip, port, website });
+                const data = JSON.stringify({ ip, port, website, skip_validation });
 
                 if (window.pybridge) {
                     window.pybridge.call('save', data);
